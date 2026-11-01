@@ -1,0 +1,6 @@
+Topic scoped for a single consumer GPU or free Colab: fine-tuning pretrained models, small or subsampled datasets, and inference-time methods. None require training a large model from scratch.
+Topic: From photos to 3D: NeRF and Gaussian splatting in practice
+- Core task — the minimum for a complete, passing project: capture your own object or scene with a phone; reconstruct it with both a NeRF variant and Gaussian splatting; compare quality, training time, and rendering speed
+- Extensions — the work that separates a good project from an excellent one: how few input views can you get away with? Sensitivity to capture pattern, motion blur, and lighting change; novel-view quality metrics.
+- Publication angle — the direction to push if your team wants a workshop paper: a practical capture guide backed by measurements — how casual can a phone capture be before reconstruction fails?
+Deliverables: Code (Reproducible repository); report (6–8 page report in conference format), presentation (15 minutes plus questions, all members present).

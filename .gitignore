@@ -1,0 +1,15 @@
+.venv/
+cv-3d-prj/
+__pycache__/
+*.pyc
+data/
+outputs/
+*.mov
+*.MOV
+*.mp4
+*.zip
+.env
+99_archives/
+scratch/
+templates/
+colab_pipeline_runner.ipynb
