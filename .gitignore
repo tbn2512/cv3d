@@ -13,3 +13,9 @@ outputs/
 scratch/
 templates/
 colab_pipeline_runner.ipynb
+
+# Model weights
+*.pth
+*.pt
+*.ckpt
+checkpoints/
