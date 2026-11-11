@@ -4,12 +4,12 @@
 **Capture device:** iPhone 16 Pro Max, iOS 27.2  
 **Local workstation:** Windows 11, RTX 3060 Laptop GPU (6 GB VRAM)  
 **Training:** Google Colab Pro  
-**Shared storage:** Google Drive (your existing ~5 TB account)  
+**Shared storage:** Google Drive  
 **Primary methods:** Nerfstudio `nerfacto` and `splatfacto`
 
 This is an executable project scaffold. The Python utilities are included in `scripts/`. It is designed to preserve raw data, create one joint COLMAP reconstruction for all capture conditions, and generate fixed evaluation splits shared across experiments.
 
-> **Important scope:** the primary benchmark is RGB-only. LiDAR/depth is an optional, separate extension. Do not give depth supervision to one model in the main NeRF-vs-3DGS comparison.
+> **Important scope:** the primary benchmark is RGB-only.
 
 ---
 
@@ -21,22 +21,22 @@ Capture five video takes/groups of the **same static object in the same unchange
 
 | Prefix | Capture | Purpose |
 |---|---|---|
-| `orbit_` | Three-ring orbit, 1/100 s shutter | Sharp baseline training views and trajectory comparison |
-| `spiral_` | One continuous helical trajectory, 1/100 s shutter | Trajectory comparison |
-| `blur_1_50_` | Same orbit path/speed, 1/50 s shutter | Moderate motion-blur condition |
-| `blur_1_25_` | Same orbit path/speed, 1/25 s shutter | Stronger motion-blur condition |
-| `holdout_` | Separate standardized reference pass at 1/100 s | Shared validation and final test cameras |
+| `orbit_` | Three-ring orbit, 1/50 s shutter | Sharp baseline training views and trajectory comparison |
+| `spiral_` | One continuous helical trajectory, 1/50 s shutter | Trajectory comparison |
+| `blur_moderate_` | Same orbit path/speed, 1/50 s shutter | Moderate motion-blur condition |
+| `blur_heavy_` | Same orbit path/speed, 1/25 s shutter | Stronger motion-blur condition |
+| `holdout_` | Separate standardized reference pass at 1/50 s | Shared validation and final test cameras |
 
 Use the same physical iPhone, 1x main lens, video resolution, frame rate, focus, scene, object position and lighting for all groups. Change only the intended experimental variable. For the blur study, keep path and walking speed constant. Shutter duration is the primary experimental factor; adjust ISO manually to keep brightness approximately comparable and record the ISO for every take. Because ISO changes can affect noise, report ISO alongside blur results rather than claiming shutter was the only changed camera parameter.
 
 **Why one joint COLMAP reconstruction?** All captures depict one static scene from the same camera/lens. Putting all selected images into one SfM run gives every condition a common coordinate system and shared camera calibration. The condition split files then choose different training images while retaining the same validation/test images. If COLMAP cannot register the blur images, do not silently drop them: report registration rate and either improve capture quality or treat that condition as a failed-registration result.
 
-### Suggested scale
+### Scale
 
 - 60–100 curated training candidates per condition.
 - 36–48 holdout candidates from the dedicated reference pass.
 - Approximately 250–400 total images in the joint SfM run.
-- Keep the number of training images balanced across conditions when comparing trajectory or blur. View-count experiments use nested 100%, 50%, 25%, and 10% subsets.
+- Keep the number of training images balanced across conditions when comparing trajectory or blur. View-count experiments use nested 100%, 50% and 25% subsets.
 
 These are starting targets, not universal thresholds. The pilot capture determines the final counts.
 
@@ -46,7 +46,7 @@ These are starting targets, not universal thresholds. The pilot capture determin
 
 1. Choose one rigid, matte, textured object. Avoid transparent, reflective, glossy, very dark, or highly repetitive objects for the first experiment.
 2. Measure and record its width, height and depth. Photograph the object in its unpowered/unchanging state.
-3. Place it on a rigid pedestal/table. **Do not rotate the object or move the pedestal between capture conditions.** The camera moves around the object.
+3. Place it on a rigid pedestal/table. **Never rotate the object or move the pedestal between capture conditions.** The camera moves around the object.
 4. Make the background static and feature-rich: textured fabric, a detailed room, or a printed feature-rich backdrop. Keep it fixed for all captures. Avoid blank walls, mirrors, windows with changing daylight, moving people, fans, screens and flickering lights.
 5. Use broad, diffuse, constant artificial lighting. Close blinds. Allow lights to warm up, then do not change their position or output during the main RGB capture series.
 6. The pedestal and any calibration texture must remain stationary. Do not attach a checkerboard/newspaper to the object. COLMAP uses static background features; the foreground mask later excludes the background from model loss.
@@ -54,7 +54,7 @@ These are starting targets, not universal thresholds. The pilot capture determin
 
 ### Pilot acceptance
 
-Before the full capture, make a 20–30 second pilot orbit. Extract 20–30 frames and check:
+Before the full capture, make a pilot orbit. Extract frames and check:
 - the object remains sharp at all elevations;
 - the object is large enough in the image but not clipped;
 - no highlights are clipped and shadows retain detail;
@@ -91,7 +91,7 @@ Use Blackmagic Camera for the controlled video captures because it exposes manua
 | Frame rate | 25 fps | Same 25 fps |
 | Codec | **Apple ProRes 422 HQ** (preferred) | Same ProRes 422 HQ |
 | Color space | Rec.709 SDR; do not record Log for the main dataset | Same |
-| Shutter | **1/100 s** (90° at 25 fps; sharper baseline) | **1/50 s** (moderate blur) and **1/25 s** (stronger blur) |
+| Shutter | **1/50 s** | **1/50 s** (moderate blur) and **1/25 s** (stronger blur) |
 | ISO | Manual; lowest value that gives a well-exposed image; lock and record it | Keep lighting/exposure comparable; record any ISO change |
 | White balance | Manual fixed Kelvin matched to lights; lock | Identical |
 | Focus | Manually focus on the object; lock focus | Identical |
@@ -100,11 +100,11 @@ Use Blackmagic Camera for the controlled video captures because it exposes manua
 | Lens correction | Choose one setting (Auto is a reasonable default) and keep it identical | Same |
 | Record LUT / proxy | Record LUT Off; proxy Off for the master dataset | Same |
 
-**Why ProRes 422 HQ?** You have substantial cloud storage, and the goal is to preserve the best practical decoded video frames for frame extraction. Blackmagic Camera for iOS lists ProRes 422 HQ, ProRes 422, ProRes 422 LT, ProRes Proxy and HEVC as available recording codecs. Use the same codec for every experimental condition. If ProRes 422 HQ proves too large or the app cannot sustain it, use ProRes 422 for *all* conditions and document the change; do not mix codecs within the benchmark. ProRes is still processed video, not sensor RAW. It reduces compression but cannot restore motion-blurred, defocused or clipped detail. <https://www.blackmagicdesign.com/products/blackmagiccamera/techspecs>
+**Why ProRes 422 HQ?** We have substantial cloud storage, and the goal is to preserve the best practical decoded video frames for frame extraction. Blackmagic Camera for iOS lists ProRes 422 HQ, ProRes 422, ProRes 422 LT, ProRes Proxy and HEVC as available recording codecs. Use the same codec for every experimental condition. If ProRes 422 HQ proves too large or the app cannot sustain it, use ProRes 422 for *all* conditions and document the change; do not mix codecs within the benchmark. ProRes is still processed video, not sensor RAW. It reduces compression but cannot restore motion-blurred, defocused or clipped detail. <https://www.blackmagicdesign.com/products/blackmagiccamera/techspecs>
 
 **iPhone 16 Pro Max storage note:** Apple lists 4K ProRes up to 30 fps on internal storage and higher frame rates with compatible external storage. 25 fps is within the internal-storage 4K range for this model. <https://support.apple.com/en-sg/109041>
 
-**Why 25 fps and these shutter settings?** Vietnam uses 50 Hz mains power. A 1/100 s exposure is synchronized to 50 Hz mains and gives a sharper baseline. Check the pilot for LED banding/flicker; LED drivers can behave differently. The 1/50 s and 1/25 s captures deliberately increase exposure time and motion blur. Keep the camera path and speed the same. Adjust ISO downward in the slower-shutter conditions as needed to keep brightness similar, and record the exact ISO. This means ISO is a documented covariate, not an invisible setting. If you cannot match exposure without reaching the app's ISO limit, document the brightness difference rather than silently changing lighting.
+**Why 25 fps and these shutter settings?** Vietnam uses 50 Hz mains power. Initially, we thought a 1/100 s exposure is synchronized to 50 Hz mains and gives a sharper baseline. Check the pilot for LED banding/flicker; LED drivers can behave differently. The 1/50 s and 1/25 s captures deliberately increase exposure time and motion blur. Keep the camera path and speed the same. Adjust ISO downward in the slower-shutter conditions as needed to keep brightness similar, and record the exact ISO. This means ISO is a documented covariate, not an invisible setting. If cannot match exposure without reaching the app's ISO limit, document the brightness difference rather than silently changing lighting.
 
 **Important stabilization correction:** set the Blackmagic Camera app's stabilization option to Off if exposed, but do not claim the iPhone's physical optical image stabilization (OIS) is disabled. Keep the app setting identical across conditions. Avoid Action Mode and lens switching. The app exposes Off/Standard/Cinematic/Extreme stabilization options; the Off setting is the reproducible app-level choice. <https://www.blackmagicdesign.com/uk/products/blackmagiccamera/techspecs>
 
@@ -155,9 +155,7 @@ For every take, fill in `configs/capture_metadata_template.yaml`. Record:
 - lighting description and camera distance; -> manual
 - trajectory and any deviations; -> manual
 - original video filenames and SHA-256 checksums. ->
-` powershell
-Get-FileHash orbit_ring1.mp4 -Algorithm SHA256
-`
+
 ---
 
 ## 3. Windows workstation setup (local preprocessing)
