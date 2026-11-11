@@ -15,11 +15,13 @@ import numpy as np
 # sharpness_pct: frames below this percentile of Laplacian variance are rejected
 # target: desired number of curated frames (uniform subsampling if exceeded)
 CONDITION_DEFAULTS = {
-    'orbit_clean':  {'sharpness_pct': 15, 'target': 80},
-    'spiral_clean': {'sharpness_pct': 15, 'target': 80},
-    'blur_1_50':    {'sharpness_pct':  5, 'target': 80},
-    'blur_1_25':    {'sharpness_pct':  3, 'target': 80},
-    'holdout':      {'sharpness_pct': 10, 'target': 42},
+    'orbit_clean':   {'sharpness_pct': 15, 'target': 80},
+    'spiral_clean':  {'sharpness_pct': 15, 'target': 80},
+    'blur_moderate': {'sharpness_pct':  5, 'target': 80},
+    'blur_heavy':    {'sharpness_pct':  3, 'target': 80},
+    'blur_1_50':     {'sharpness_pct':  5, 'target': 80},
+    'blur_1_25':     {'sharpness_pct':  3, 'target': 80},
+    'holdout':       {'sharpness_pct': 10, 'target': 42},
 }
 
 

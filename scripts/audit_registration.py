@@ -15,7 +15,7 @@ import csv
 from pathlib import Path
 
 EXTS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
-DEFAULT_PREFIXES = ("orbit_", "spiral_", "blur_1_50_", "blur_1_25_", "holdout_")
+DEFAULT_PREFIXES = ("orbit_", "spiral_", "blur_moderate_", "blur_heavy_", "blur_1_50_", "blur_1_25_", "holdout_")
 
 
 def main() -> None:
